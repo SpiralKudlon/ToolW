@@ -1,4 +1,42 @@
+# ─── Node / Vite (Frontend) ───────────────────────────────────────────────────
 node_modules/
 dist/
-.env
+.vite/
 *.local
+
+# ─── Python (Backend) ────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyc
+*.pyo
+
+# Virtual environments
+venv/
+.venv/
+env/
+.env/
+
+# Distribution / packaging
+*.egg-info/
+dist/
+build/
+*.egg
+
+# ─── Environment & Secrets ───────────────────────────────────────────────────
+.env
+.env.*
+!.env.example
+
+# ─── Data Files ──────────────────────────────────────────────────────────────
+# NetGuard device registry (contains router credentials)
+netguard/api/devices.json
+
+# ─── Editors & OS ────────────────────────────────────────────────────────────
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
