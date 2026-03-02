@@ -1,0 +1,89 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@600;800&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body { background: #0a0e1a; color: #e0e6f0; font-family: 'Space Mono', monospace; font-size: 13px; }
+
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: #0a0e1a; }
+::-webkit-scrollbar-thumb { background: #1e3a5f; border-radius: 2px; }
+
+/* Cards */
+.card { background: #0f1628; border: 1px solid #1a2a45; border-radius: 8px; position: relative; }
+
+/* Buttons */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  border: none; cursor: pointer; border-radius: 6px;
+  font-family: 'Space Mono', monospace; font-size: 11px; font-weight: 700;
+  letter-spacing: 0.5px; padding: 8px 14px; transition: all 0.15s; white-space: nowrap;
+}
+.btn:hover:not(:disabled) { filter: brightness(1.15); transform: translateY(-1px); }
+.btn:active:not(:disabled) { transform: translateY(0); }
+.btn:disabled { opacity: 0.35; cursor: not-allowed; }
+.btn-primary   { background: #00e5a0; color: #0a0e1a; }
+.btn-secondary { background: #1a2a45; color: #8099bf; }
+.btn-danger    { background: #ff4757; color: #fff; }
+.btn-danger-outline { background: rgba(255,71,87,0.12); color: #ff4757; border: 1px solid rgba(255,71,87,0.3); }
+.btn-icon      { background: #1a2a45; color: #8099bf; padding: 6px 8px; }
+
+/* Inputs */
+.input {
+  background: #080d18; border: 1px solid #1e3a5f; border-radius: 6px;
+  color: #e0e6f0; padding: 10px 12px;
+  font-family: 'Space Mono', monospace; font-size: 12px; width: 100%;
+  outline: none; transition: border-color 0.2s;
+}
+.input:focus { border-color: #00e5a0; }
+.input[readonly] { opacity: 0.5; cursor: not-allowed; }
+
+/* Sidebar */
+.sidebar {
+  width: 220px; min-height: 100vh; background: #080d18;
+  border-right: 1px solid #1a2a45; display: flex; flex-direction: column; flex-shrink: 0;
+}
+.nav-item {
+  display: flex; align-items: center; gap: 12px; padding: 12px 20px; cursor: pointer;
+  font-size: 10px; letter-spacing: 1.5px; color: #4a6080; transition: all 0.15s;
+  border-left: 3px solid transparent; user-select: none;
+}
+.nav-item:hover { background: rgba(255,255,255,0.03); color: #8099bf; }
+.nav-item.active { color: #00e5a0; border-left-color: #00e5a0; background: rgba(0,229,160,0.05); }
+.nav-badge { margin-left: auto; background: #1a2a45; color: #8099bf; font-size: 9px; padding: 2px 7px; border-radius: 10px; }
+.nav-item.active .nav-badge { background: rgba(0,229,160,0.15); color: #00e5a0; }
+
+/* Table */
+.device-row { border-bottom: 1px solid #0f1a2e; padding: 12px 16px; transition: background 0.1s; }
+.device-row:hover { background: #0c1525; }
+.device-row:last-child { border-bottom: none; }
+
+/* Progress */
+.progress-bar { height: 4px; background: #1a2a45; border-radius: 2px; overflow: hidden; }
+.progress-fill { height: 100%; border-radius: 2px; transition: width 0.4s; }
+
+/* Toast */
+.toast {
+  position: fixed; top: 20px; right: 20px; padding: 12px 20px; border-radius: 8px;
+  font-size: 12px; z-index: 9999; animation: slideIn 0.25s ease; max-width: 360px;
+}
+@keyframes slideIn { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: none; } }
+
+/* Modal */
+.modal-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.75); backdrop-filter: blur(4px);
+  display: flex; align-items: center; justify-content: center; z-index: 1000;
+}
+.modal-card { width: 480px; padding: 32px; max-height: 90vh; overflow-y: auto; }
+
+/* Animations */
+.blink { animation: blink 1.4s infinite; }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.2} }
+.spin { display: inline-block; animation: spin 0.8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Helpers */
+.section-label { font-size: 9px; color: #4a6080; letter-spacing: 2.5px; margin-bottom: 14px; }
+.stat-table { width: 100%; border-collapse: collapse; font-size: 11px; }
+.stat-table td { padding: 4px 0; }
+.stat-table td:last-child { text-align: right; color: #e0e6f0; }
+.stat-table td:first-child { color: #4a6080; padding-right: 12px; }
