@@ -12,6 +12,7 @@ from contextlib import asynccontextmanager
 from typing import Optional
 
 from fastapi import FastAPI, HTTPException, Query
+from fastapi.responses import RedirectResponse
 from fastapi.middleware.cors import CORSMiddleware
 
 from .api import device_store as store
@@ -397,6 +398,11 @@ def sync_status():
 
 
 # ─── Health ──────────────────────────────────────────────────────────────────
+
+@app.get("/", include_in_schema=False)
+def root():
+    return RedirectResponse(url="/docs")
+
 
 @app.get("/health")
 def health():
