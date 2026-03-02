@@ -1,6 +1,7 @@
 """
 RouterSync: background task that periodically syncs device state with the router.
 - Polls connected devices every 60s
+- Increments used_minutes for connected devices each cycle
 - Pushes MAC whitelist when changes are detected
 - Blocks devices whose time has expired
 """
@@ -9,6 +10,12 @@ import logging
 import threading
 import time
 from typing import Optional
+
+from .device_store import (
+    sync_connected_devices, get_expired_devices,
+    get_whitelisted_macs, update_device, list_devices, add_usage_time
+)
+from ..router.huawei_client import HuaweiRouterClient, RouterConfig, HuaweiRouterError
 
 logger = logging.getLogger(__name__)
 
@@ -68,12 +75,6 @@ class RouterSync:
 
     def _do_sync(self) -> dict:
         """Core sync logic: connect to router, update state, push whitelist."""
-        from .device_store import (
-            sync_connected_devices, get_expired_devices,
-            get_whitelisted_macs, update_device, list_devices
-        )
-        from ..router.huawei_client import HuaweiRouterClient, RouterConfig, HuaweiRouterError
-
         cfg = self._get_config()
         if not cfg.get("password"):
             logger.debug("Router password not configured, skipping sync")
@@ -90,6 +91,7 @@ class RouterSync:
             "connected": 0,
             "expired_blocked": 0,
             "whitelist_pushed": False,
+            "time_ticked": 0,
         }
 
         try:
@@ -103,9 +105,19 @@ class RouterSync:
                     {"mac": d.mac, "ip": d.ip, "hostname": d.hostname}
                     for d in router_devices
                 ]
-                sync_connected_devices(router_device_dicts)
+                synced_devices = sync_connected_devices(router_device_dicts)
 
-                # 3. Block expired devices
+                # 3. Tick usage time for every currently-connected device
+                tick_minutes = self.poll_interval // 60 or 1
+                connected_ids = [
+                    dev["id"] for dev in synced_devices
+                    if dev["status"] == "connected"
+                ]
+                for dev_id in connected_ids:
+                    add_usage_time(dev_id, tick_minutes)
+                result["time_ticked"] = len(connected_ids)
+
+                # 4. Block expired devices
                 expired = get_expired_devices()
                 if expired:
                     for dev in expired:

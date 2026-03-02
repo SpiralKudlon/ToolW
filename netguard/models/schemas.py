@@ -78,5 +78,5 @@ class ActionResponse(BaseModel):
 
 
 class BulkActionRequest(BaseModel):
-    device_ids: list
-    action: str
+    device_ids: list[str]
+    action: Literal["block", "unblock", "reset_time", "remove"]

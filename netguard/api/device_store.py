@@ -1,32 +1,32 @@
 """
 In-memory + JSON-file device store with time tracking.
-Persists to devices.json in the working directory.
+Persists to devices.json alongside this module.
 """
 
 import json
 import uuid
 import logging
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Optional
 from threading import Lock
 
 logger = logging.getLogger(__name__)
 
-DATA_FILE = Path("devices.json")
+DATA_FILE = Path(__file__).parent / "devices.json"
 _lock = Lock()
 
 
 def _now_iso() -> str:
-    return datetime.utcnow().isoformat() + "Z"
+    return datetime.now(timezone.utc).isoformat()
 
 
 def _load() -> dict:
     if DATA_FILE.exists():
         try:
             return json.loads(DATA_FILE.read_text())
-        except Exception:
-            pass
+        except Exception as e:
+            logger.error("Failed to parse %s — data may be corrupted: %s", DATA_FILE, e)
     return {"devices": {}, "config": {
         "host": "192.168.100.1",
         "username": "root",
@@ -95,7 +95,7 @@ def update_device(device_id: str, updates: dict) -> Optional[dict]:
         allowed = {"name", "owner", "allocated_minutes", "status",
                    "used_minutes", "last_seen", "ip_address"}
         for k, v in updates.items():
-            if k in allowed and v is not None:
+            if k in allowed:
                 data["devices"][device_id][k] = v
         _save(data)
         return data["devices"][device_id]
@@ -176,7 +176,7 @@ def sync_connected_devices(router_devices: list[dict]):
         if changed:
             _save(data)
 
-    return list(data["devices"].values())
+        return list(data["devices"].values())
 
 
 def get_expired_devices() -> list[dict]:
@@ -187,10 +187,10 @@ def get_expired_devices() -> list[dict]:
 
 
 def get_whitelisted_macs() -> list[dict]:
-    """Return all non-blocked devices as MAC filter entries."""
+    """Return all non-blocked, non-expired devices as MAC filter entries."""
     return [
         {"mac": d["mac"], "name": d["name"]}
         for d in list_devices()
-        if d["status"] not in ("blocked",)
+        if d["status"] not in ("blocked", "expired")
         and d["used_minutes"] < d["allocated_minutes"]
     ]
